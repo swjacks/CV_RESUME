@@ -5,6 +5,10 @@ Created on Thu Jun 11 11:40:54 2020
 
 Solving Differential Equations with a Neural Network Using Pytorch
 
+Define Loss function as:
+    Differential Equation 
+
+
 @author: shanejackson
 """
 
@@ -16,10 +20,10 @@ dtype = torch.float
 device = torch.device("cpu")
 
 N, D_in, H, D_out = 100, 1, 22, 1
-epochs = 50000
+epochs = 10000
 
 #x = torch.randn(N,D_in)#, device=device, dtype=dtype,requires_grad=False)
-x = torch.linspace(0,math.pi/2,N)
+x = torch.linspace(0,math.pi,N)
 x=x.view(N,D_in)
 #y = torch.randn(N,D_out)#, device=device, dtype=dtype, requires_grad=False)
 
@@ -39,6 +43,22 @@ class MyModel(torch.nn.Module):
         dQt  = self.linear2.weight.mm(dg).t()
         ddQt = self.linear2.weight.mm(ddg).t()
         return torch.stack([Qt,dQt,ddQt],dim=0)
+
+def diffLoss(y,ics,diffEq,setIcs):
+    diff   = diffEq(y)#(y[0]+y[2]).pow(2).sum()
+    initCond = setIcs(ics)
+    loss     = diff+10*initCond
+    return loss
+
+
+
+def sine(y):
+    diffEq = (y[0]+y[2]).pow(2).sum()
+    return diffEq
+def setIC(ics):
+    return (ics[0]).pow(2).sum()+(ics[1]-1.0).pow(2).sum()
+
+
 lr = 1e-4
 model = MyModel(D_in,H,D_out)
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -47,7 +67,8 @@ for t in range(epochs):
     
     y =  model(x)
     ics = model(torch.tensor([[0.0]]))
-    loss = (y[0]+y[2]).pow(2).sum()+10*(ics[0]).pow(2).sum()+10*(ics[1]-1.0).pow(2).sum()
+    #loss = (y[0]+y[2]).pow(2).sum()+10*(ics[0]).pow(2).sum()+10*(ics[1]-1.0).pow(2).sum()
+    loss=diffLoss(y,ics,sine,setIC)
     if t % 1000 == 999:
         print(loss)
     
@@ -60,5 +81,5 @@ for t in range(epochs):
 
 
 
-plt.plot(x,y[0].detach())
-plt.plot(x,np.sin(x))
+plt.plot(x,y[0].detach(),'r')
+plt.plot(x,np.sin(x),'b--')
