@@ -1,4 +1,4 @@
-# CV_RESUME
+# CV/RESUME
 
 ## Papers
 A Neural Network for Principle of Least Action - Submitted for Review, Co-first Author
