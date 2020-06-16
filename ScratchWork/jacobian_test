@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jun 15 11:53:58 2020
+
+@author: shanejackson
+"""
+
+import torch 
+import math 
+import matplotlib.pyplot as plt
+import numpy as np
+dtype = torch.float
+device = torch.device("cpu")
+
+N, D_in, H, D_out = 10, 1, 5, 3
+epochs = 10000
+
+#x = torch.randn(N,D_in)#, device=device, dtype=dtype,requires_grad=False)
+x = torch.linspace(0,math.pi,N,requires_grad = True)
+x=x.view(N,D_in)
+#y = torch.randn(N,D_out)#, device=device, dtype=dtype, requires_grad=False)
+
+class MyModel(torch.nn.Module):
+    def __init__(self, D_in,H,D_out):
+        super(MyModel, self).__init__()
+        self.linear1 = torch.nn.Linear(D_in, H)
+        self.linear2 = torch.nn.Linear(H, D_out)
+    def forward(self, x):
+        #g, dg, ddg activation function + 2 derivatvies with respect to input
+        g    = torch.tanh        
+        act1 = g(self.linear1(x))
+#        dg   = (1-act1.t()**2) * self.linear1.weight
+#        ddg  = -2*dg*self.linear1.weight *act1.t()
+        
+        Qt   = self.linear2(act1)
+#        dQt  = self.linear2.weight.mm(dg).t()
+#        ddQt = self.linear2.weight.mm(ddg).t()
+        return Qt
+
+def diffLoss(y,ics,diffEq,setIcs):
+    diff   = diffEq(y)#(y[0]+y[2]).pow(2).sum()
+    initCond = setIcs(ics)
+    loss     = diff+10*initCond
+    return loss
+
+net = MyModel(D_in,H,D_out)
+input = x 
+output = net(input)
+
+def calcdQ(x):
+    return torch.autograd.functional.jacobian(net,x,create_graph = True)
+dQ  = torch.autograd.functional.jacobian(net,x,create_graph = True)
+ddQ = torch.autograd.functional.jacobian(calcdQ,x,create_graph = True)
+
+
+def loss_Function(dQ,ddQ):
+    #dQ = calcdQ(x)
+    #ddQ = torch.autograd.functional.jacobian(calcdQ,x,create_graph = True)
+    return (ddQ**2).sum()
+loss=loss_Function(dQ,ddQ)
+loss.backward()
+
+#ddQ = torch.autograd.functional.hessian(net,x,create_graph = True)
+#w = torch.autograd.Variable(torch.ones(N,D_out))
+#w2 = torch.autograd.Variable(torch.ones(N,D_out))
+#jacob = torch.autograd.grad(output.view([N,D_out]), input, grad_outputs=w, create_graph=True)[0]
+#y = torch.autograd.grad(jacob, input, grad_outputs =w2, create_graph=True)[0]
+
+g    = torch.tanh        
+act1 = g(net.linear1(x))
+dg   = (1-act1.t()**2) * net.linear1.weight
+ddg  = -2*dg*net.linear1.weight *act1.t()
+
+Qt   = net.linear2(act1)
+dQt  = net.linear2.weight.mm(dg).t()
+ddQt = net.linear2.weight.mm(ddg).t()

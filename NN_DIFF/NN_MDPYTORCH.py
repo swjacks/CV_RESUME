@@ -1,17 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jun 11 11:40:54 2020
-
-Solving Differential Equations with a Neural Network Using Pytorch
-
-Define Loss function as:
-    Differential Equation 
-
+Created on Mon Jun 15 13:20:06 2020
 
 @author: shanejackson
 """
-
 import torch 
 import math 
 import matplotlib.pyplot as plt
@@ -19,7 +12,7 @@ import numpy as np
 dtype = torch.float
 device = torch.device("cpu")
 
-N, D_in, H, D_out = 100, 1, 22, 1
+N, D_in, H, D_out = 100, 1, 22, 2
 epochs = 10000
 
 #x = torch.randn(N,D_in)#, device=device, dtype=dtype,requires_grad=False)
@@ -53,12 +46,21 @@ def diffLoss(y,ics,diffEq,setIcs):
 
 ## Define the differential Equation and Initial Conditions to pass
 ## into loss funtion
+## Terms we will need each epoch 
+## T - kinetic energy
+## V - Potential energy 
+## Raidii 
 def sine(y):
     diffEq = (y[0]+y[2]).pow(2).sum()
     return diffEq
 def setIC(ics):
     return (ics[0]).pow(2).sum()+(ics[1]-1.0).pow(2).sum()
 
+def Action(Qt): ## OM Action
+    dA = (Qt[2][:,:D_out] - fx) ** 2
+    dA += (Qt[2][:,Np:2*Np] - fy) ** 2 
+    dA += (Qt[2][:,2*Np:] - fz) ** 2   
+    return dA
 
 lr = 1e-4
 model = MyModel(D_in,H,D_out)
