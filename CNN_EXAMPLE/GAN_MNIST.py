@@ -54,10 +54,10 @@ ngf = 32
 ndf = 32
 
 # Number of training epochs
-num_epochs = 5
+num_epochs = 20
 
 # Learning rate for optimizers
-lr = 0.0002
+lr = 0.0001
 
 # Beta1 hyperparam for Adam optimizers
 beta1 = 0.5
@@ -267,6 +267,11 @@ for epoch in range(num_epochs):
             img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
 
         iters += 1
+runname = 'run1'
+torch.save(netG.state_dict(), f'./results/GANG_{runname}.pth')
+torch.save(optimizerG.state_dict(), f'./results/optimizerG_{runname}.pth')
+torch.save(netD.state_dict(), f'./results/GAND_{runname}.pth')
+torch.save(optimizerD.state_dict(), f'./results/optimizerD_{runname}.pth')
 import matplotlib.pyplot as plt 
 import matplotlib.animation as animation
 from IPython.display import HTML
