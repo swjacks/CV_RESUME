@@ -48,17 +48,17 @@ nc = 1
 nz = 100 
 
 # Size of feature maps in generator
-ngf = 32
+ngf = 64
 
 # Size of feature maps in discriminator
-ndf = 32
+ndf = 64
 
 # Number of training epochs
 num_epochs = 20
 
 # Learning rate for optimizers
-lr = 0.0001
-
+lrG = 0.0001
+lrD = 0.0004
 # Beta1 hyperparam for Adam optimizers
 beta1 = 0.5
 
@@ -167,22 +167,10 @@ real_label = 0.9
 fake_label = 0
 
 # Setup Adam optimizers for both G and D
-optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta1, 0.999))
-optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
+optimizerD = optim.Adam(netD.parameters(), lr=lrD, betas=(beta1, 0.999))
+optimizerG = optim.Adam(netG.parameters(), lr=lrG, betas=(beta1, 0.999))
 
 criterion = nn.BCELoss()
-
-# Create batch of latent vectors that we will use to visualize
-#  the progression of the generator
-fixed_noise = torch.randn(64, nz, 1, 1, device=device)
-
-# Establish convention for real and fake labels during training
-real_label = 0.9
-fake_label = 0
-
-# Setup Adam optimizers for both G and D
-optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta1, 0.999))
-optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 
 
 # Training Loop
@@ -267,7 +255,7 @@ for epoch in range(num_epochs):
             img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
 
         iters += 1
-runname = 'run1'
+runname = 'run2'
 torch.save(netG.state_dict(), f'./results/GANG_{runname}.pth')
 torch.save(optimizerG.state_dict(), f'./results/optimizerG_{runname}.pth')
 torch.save(netD.state_dict(), f'./results/GAND_{runname}.pth')
