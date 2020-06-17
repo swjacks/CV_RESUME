@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jun 17 11:42:23 2020
+
+@author: shanejackson
+"""
+
+Notes on Runs:
+GAN_MNIST Run1: DCGAN, lrG=lrD = 0.0001 #Still apparent generator collapse.  No recognizable outputs.  
+GAN_MNIST Run2: DCGAN, lrD=4*lrG=0.0004
