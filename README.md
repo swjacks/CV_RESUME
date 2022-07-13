@@ -10,11 +10,11 @@
 
 ## Code
 
-# Publically Available Work Projects 
+### Publically Available Work Projects 
 D-dimensional Kolmogorov-Smirnov Distance: https://github.com/pnnl/DDKS
 
 
-# Research Codes
+### Research Codes
 DAM: Dense Assosiative Memory Network Trained on MNIST dataset 
 Neural Network Molecular Dynamics Code: Boundary Value Problem
 Neural Network Molecular Dynamics Code: Initial Value Problem
